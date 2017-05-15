@@ -35,47 +35,59 @@ from traitlets import (
 )
 import requests
 
-from ipyparallel.apps.launcher import BaseLauncher, ControllerMixin, EngineMixin 
+from ipyparallel.apps.launcher import BaseLauncher, ControllerMixin, EngineMixin
 
 
 class MarathonLauncher(BaseLauncher):
-    raw_marathon_api_url = '{}/v2/apps/{}' 
+    raw_marathon_api_url = '{}/v2/apps/{}'
     base_marathon_config = {
         'mem': 1024,
-        'env': {},
+        'env': {"PYTHONPATH": "/data/site-packages/:$PYTHONPATH"},
         'instances': 1,
         'container': {
             'docker': {
                 'image': '',
                 'forcePullImage': True
             },
-            'type': 'DOCKER'},
+            'type': 'DOCKER',
+            "volumes": [
+                {
+                    "containerPath": "/data",
+                    "hostPath": "/data",
+                    "mode": "RW"
+                }
+            ]
+        },
         'cpus': 0.9,
-        'id': ''
+        'id': '',
+        # TODO modify this option to the config file
+        "uris": [
+            "file:///etc/docker.tar.gz"
+        ],
     }
 
     marathon_master_url = Unicode('', config=True,
-        help="host and port for marathon api")
-        
+                                  help="host and port for marathon api")
+
     marathon_app_group = Unicode('', config=True,
-        help="Marathon application id path")
+                                 help="Marathon application id path")
 
     controller_app_name = 'controller'
 
     controller_config_port = Unicode('1235', config=True,
-        help="Port controller exposes to share client/engine configs")
+                                     help="Port controller exposes to share client/engine configs")
 
     controller_docker_image = Unicode('', config=True,
-        help="Docker image of controller to launch")
+                                      help="Docker image of controller to launch")
 
     engine_docker_image = Unicode('', config=True,
-        help="Docker image of engine to launch")
+                                  help="Docker image of engine to launch")
 
     engine_memory = Integer(1024, config=True,
-        help="Amount of memory to allocate to the engine docker image")
+                            help="Amount of memory to allocate to the engine docker image")
 
     controller_memory = Integer(512, config=True,
-        help="Amount of memory to allocate to the engine docker image")
+                                help="Amount of memory to allocate to the engine docker image")
 
     @property
     def controller_marathon_id(self):
@@ -93,7 +105,7 @@ class MarathonLauncher(BaseLauncher):
         # TODO: is there a way in traits to require a config
         assert self.marathon_master_url, "marathon_master_url is required"
         assert self.marathon_app_group, "marathon_app_group is required"
-        
+
     def _wait_for_marathon_app_to_start(self, app_url, tries=240, sleep=0.5):
         for i in range(tries):
             app_resp = requests.get(app_url)
@@ -101,7 +113,7 @@ class MarathonLauncher(BaseLauncher):
                 self.log.debug("Found app: {} in marathon".format(app_url))
                 app_info = app_resp.json()
                 if app_info['app']['instances'] == app_info['app']['tasksRunning']:
-                    return app_info 
+                    return app_info
                 else:
                     self.log.debug("Application: {} still scalling".format(app_url))
             time.sleep(sleep)
@@ -123,7 +135,8 @@ class MarathonControllerLauncher(MarathonLauncher):
         self._write_client_connection_dict(controller)
 
     def _write_client_connection_dict(self, controller):
-        controller_config_url = 'http://{}:{}/ipcontroller-client.json'.format(controller['app']['tasks'][0]['host'], self.controller_config_port)
+        controller_config_url = 'http://{}:{}/ipcontroller-client.json'.format(controller['app']['tasks'][0]['host'],
+                                                                               self.controller_config_port)
         # HACKY RETRY FIX
         for i in range(10):
             try:
@@ -136,7 +149,6 @@ class MarathonControllerLauncher(MarathonLauncher):
 
         self.stop()
         raise RuntimeError("Failed to write client connection dict stopping cluster")
-
 
     def _save_connection_dict(self, connection_dict):
         fname = 'ipcontroller-client.json'
@@ -231,6 +243,6 @@ class MarathonEngineSetLauncher(MarathonLauncher):
             'MARATHON_MASTER': self.marathon_master_url,
             'CONTROLLER_MARATHON_ID': self.controller_marathon_id,
             'CONTROLLER_CONFIG_PORT': self.controller_config_port,
-            
+
         }
         return marathon_config
