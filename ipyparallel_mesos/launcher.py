@@ -42,7 +42,7 @@ class MarathonLauncher(BaseLauncher):
     raw_marathon_api_url = '{}/v2/apps/{}'
     base_marathon_config = {
         'mem': 1024,
-        'env': {"PYTHONPATH": "/data/site-packages/:$PYTHONPATH"},
+        'env': {},
         'instances': 1,
         'container': {
             'docker': {
@@ -50,13 +50,6 @@ class MarathonLauncher(BaseLauncher):
                 'forcePullImage': True
             },
             'type': 'DOCKER',
-            "volumes": [
-                {
-                    "containerPath": "/data",
-                    "hostPath": "/data",
-                    "mode": "RW"
-                }
-            ]
         },
         'cpus': 0.9,
         'id': '',
@@ -82,6 +75,12 @@ class MarathonLauncher(BaseLauncher):
 
     engine_docker_image = Unicode('', config=True,
                                   help="Docker image of engine to launch")
+
+    engine_docker_env = Dict({}, config=True,
+                             help="Environment variables of engine container")
+
+    engine_docker_volumes = Dict({}, Config=True,
+                                 help="Host Volumes of engine container")
 
     engine_memory = Integer(1024, config=True,
                             help="Amount of memory to allocate to the engine docker image")
@@ -239,10 +238,11 @@ class MarathonEngineSetLauncher(MarathonLauncher):
         marathon_config['instances'] = n
         marathon_config['mem'] = self.engine_memory
         marathon_config['container']['docker']['image'] = self.engine_docker_image
+        marathon_config['container']['docker']['volumes'] = self.engine_docker_volumes
         marathon_config['env'] = {
             'MARATHON_MASTER': self.marathon_master_url,
             'CONTROLLER_MARATHON_ID': self.controller_marathon_id,
             'CONTROLLER_CONFIG_PORT': self.controller_config_port,
-
         }
+        marathon_config["env"].update(self.engine_docker_env)
         return marathon_config
