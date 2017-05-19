@@ -31,7 +31,7 @@ import os
 import json
 
 from traitlets import (
-    Any, Integer, CFloat, List, Unicode, Dict, Instance, HasTraits, CRegExp
+    Any, Integer, CFloat, List, Unicode, Dict, Instance, HasTraits, CRegExp, Bool
 )
 import requests
 
@@ -47,7 +47,7 @@ class MarathonLauncher(BaseLauncher):
         'container': {
             'docker': {
                 'image': '',
-                'forcePullImage': True
+                'forcePullImage': False
             },
             'type': 'DOCKER',
         },
@@ -58,6 +58,9 @@ class MarathonLauncher(BaseLauncher):
             "file:///etc/docker.tar.gz"
         ],
     }
+
+    force_pull_image = Bool(False, config=True,
+                            help="Force pull images when deploy")
 
     marathon_master_url = Unicode('', config=True,
                                   help="host and port for marathon api")
