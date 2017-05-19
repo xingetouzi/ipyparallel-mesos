@@ -79,10 +79,10 @@ class MarathonLauncher(BaseLauncher):
     engine_docker_image = Unicode('', config=True,
                                   help="Docker image of engine to launch")
 
-    engine_docker_env = Dict({}, config=True,
+    engine_docker_env = Dict(config=True,
                              help="Environment variables of engine container")
 
-    engine_docker_volumes = List([], Config=True,
+    engine_docker_volumes = List(Config=True,
                                  help="Host Volumes of engine container")
 
     engine_memory = Integer(1024, config=True,
