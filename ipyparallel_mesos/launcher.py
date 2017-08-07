@@ -82,6 +82,9 @@ class MarathonLauncher(BaseLauncher):
     engine_docker_env = Dict(config=True,
                              help="Environment variables of engine container")
 
+    engine_docker_env_keep = List(config=True,
+                                  help="Environment variables to inherit of engine container")
+
     engine_docker_volumes = List(Config=True,
                                  help="Host Volumes of engine container")
 
@@ -248,4 +251,6 @@ class MarathonEngineSetLauncher(MarathonLauncher):
             'CONTROLLER_CONFIG_PORT': self.controller_config_port,
         }
         marathon_config["env"].update(self.engine_docker_env)
+        for env in self.engine_docker_env_keep:
+            marathon_config["env"][env] = os.environ.get(env, "")
         return marathon_config
