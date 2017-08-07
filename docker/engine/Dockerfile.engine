@@ -1,13 +1,34 @@
-FROM python:3
+FROM continuumio/miniconda3
 
-RUN apt-get update && apt-get install supervisor jq -y
+#更新apt-get源 使用163的源
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
+    echo "deb http://mirrors.163.com/debian/ jessie main non-free contrib" >/etc/apt/sources.list && \
+    echo "deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list && \
+    echo "deb-src http://mirrors.163.com/debian/ jessie main non-free contrib" >>/etc/apt/sources.list && \
+    echo "deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
+
+RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
+    conda config --set show_channel_urls yes
+
+RUN apt-get update --fix-missing && apt-get install supervisor jq -y
 
 WORKDIR /opt
 
 COPY requirements.txt /opt/requirements.txt
-RUN pip install -r ./requirements.txt
+RUN conda install --file ./requirements.txt
 
 ENV IPYTHONDIR=/opt/
 CMD ["/usr/bin/supervisord", "-c", "./engine/supervisord.conf"]
 RUN chmod 666 /opt/
 COPY . /opt
+
+# 大鱼引擎包
+
+RUN apt-get install gcc g++ build-essential -y
+COPY pip.conf /root/.pip/pip.conf
+RUN git clone https://git.oschina.net/BurdenBear/bigfishtrader.git
+RUN cd ./bigfishtrader && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+python setup.py install && cd ..
+COPY ta-lib ./ta-lib
+RUN cd ta-lib && ./configure --prefix=/usr && make && make install && cd .. 
+RUN pip install TA-Lib
