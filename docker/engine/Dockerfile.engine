@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM continuumio/anaconda3
 
 #更新apt-get源 使用163的源
 RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
@@ -10,25 +10,36 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
 RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
     conda config --set show_channel_urls yes
 
-RUN apt-get update --fix-missing && apt-get install supervisor jq -y
+RUN apt-get update --fix-missing && apt-get install sudo supervisor jq -y
 
 WORKDIR /opt
-
-COPY requirements.txt /opt/requirements.txt
-RUN conda install --file ./requirements.txt
 
 ENV IPYTHONDIR=/opt/
 CMD ["/usr/bin/supervisord", "-c", "./engine/supervisord.conf"]
 RUN chmod 666 /opt/
 COPY . /opt
 
-# 大鱼引擎包
+RUN conda create --quiet -yes -p ${CONDA_DIR}/envs/python2 python=2.7 \
+    'anaconda' && \
+    conda remove -n python2 --quiet --yes --force qt pyqt &&\
+    conda clean -tipsy
+
+# Add shortcuts to distinguish pip for python2 and python3 envs
+RUN ln -s $CONDA_DIR/envs/python2/bin/pip $CONDA_DIR/bin/pip2 && \
+    ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip3
 
 RUN apt-get install gcc g++ build-essential -y
+
 COPY pip.conf /root/.pip/pip.conf
-RUN git clone https://git.oschina.net/BurdenBear/bigfishtrader.git
-RUN cd ./bigfishtrader && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && \
-python setup.py install && cd ..
-COPY ta-lib ./ta-lib
-RUN cd ta-lib && ./configure --prefix=/usr && make && make install && cd .. 
-RUN pip install TA-Lib
+
+RUN wget -O ta-lib.tar.gz http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+tar -xzf ta-lib.tar.gz &&\
+cd ta-lib && ./configure --prefix=/usr && make && make install && cd ..
+
+COPY ./engine/requirements.txt /opt/requirements.txt
+
+RUN pip install -r /opt/requirements.txt
+
+RUN ${CONDA_DIR}/envs/python2/bin/pip install -r /opt/requirements.txt
+
+

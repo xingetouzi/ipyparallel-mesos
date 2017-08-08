@@ -10,12 +10,11 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
 RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
     conda config --set show_channel_urls yes
 
-
 RUN apt-get update --fix-missing && apt-get install supervisor -y
 
 WORKDIR /opt
 
-copy requirements.txt /opt/requirements.txt
+copy ./controller/requirements.txt /opt/requirements.txt
 RUN conda install --file ./requirements.txt
 
 ENV IPYTHONDIR=/opt/
