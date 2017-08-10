@@ -3,8 +3,8 @@
 DOCKER_REGISTRY=registry.fxdayu.com
 DOCKER_TAG=$1
 
-docker build -t ${DOCKER_REGISTRY}/ipyparallel-marathon-controller:${DOCKER_TAG} -f ./controller/Dockerfile.controller .
-docker build -t ${DOCKER_REGISTRY}/ipyparallel-marathon-engine:${DOCKER_TAG} -f ./engine/Dockerfile.engine .
+docker build -t ${DOCKER_REGISTRY}/ipyparallel-marathon-controller:${DOCKER_TAG} -f ./Dockerfile.controller .
+docker build -t ${DOCKER_REGISTRY}/ipyparallel-marathon-engine:${DOCKER_TAG} -f ./Dockerfile.engine .
 
 if [ "$DOCKER_TAG" == "dev" ]; then
     echo "dev build. not shipping"
