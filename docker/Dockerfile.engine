@@ -39,7 +39,7 @@ RUN wget -O ta-lib.tar.gz http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0
 tar -xzf ta-lib.tar.gz &&\
 cd ta-lib && ./configure --prefix=/usr && make && make install && cd ..
 
-COPY ./engine /opt
+COPY ./engine /opt/engine
 
 COPY ./engine/requirements.txt /opt/requirements.txt
 
