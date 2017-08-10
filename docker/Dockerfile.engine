@@ -22,8 +22,6 @@ CMD ["/usr/bin/supervisord", "-c", "./engine/supervisord.conf"]
 
 RUN chmod 666 /opt/
 
-COPY . /opt
-
 RUN conda create --quiet --yes -p ${CONDA_DIR}/envs/python2 python=2.7 \
     'anaconda' && \
     conda remove -n python2 --quiet --yes --force qt pyqt &&\
@@ -41,7 +39,11 @@ RUN wget -O ta-lib.tar.gz http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0
 tar -xzf ta-lib.tar.gz &&\
 cd ta-lib && ./configure --prefix=/usr && make && make install && cd ..
 
+COPY ./engine /opt
+
 COPY ./engine/requirements.txt /opt/requirements.txt
+
+ARG EXTRA_MODULE_HASH=""
 
 RUN pip install -r /opt/requirements.txt
 

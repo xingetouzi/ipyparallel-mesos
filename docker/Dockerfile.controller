@@ -20,4 +20,5 @@ RUN conda install --file ./requirements.txt
 ENV IPYTHONDIR=/opt/
 CMD ["/usr/bin/supervisord", "-c", "./controller/supervisord.conf"]
 RUN chmod 666 /opt/
+
 COPY . /opt

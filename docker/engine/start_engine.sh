@@ -8,7 +8,7 @@ else
   echo "Creating user ${USER} (${USER_ID})"
   useradd -u ${USER_ID} -M -s $SHELL ${USER}
 fi
-chown ${USER}:${USER} ${HOME}/${USER}
+chown ${USER}:${USER} /home/${USER}
 
 # Query marathon find host of ipython paralell controller
 CONTROLLER_HOST=`curl $MARATHON_MASTER/v2/apps/$CONTROLLER_MARATHON_ID | jq -r '.app.tasks | .[0].host'`
