@@ -50,10 +50,8 @@ RUN pip install -r /opt/requirements.txt && ${CONDA_DIR}/envs/python2/bin/pip in
 
 # force update requirement module, usually some custom pakages
 
-# using envsubst to set this value before docker build to identify whether to force update,
-# you can bind it with some value able to decide the package version,
-# such like the github commit id of you package's source code
-ARG EXTRA_PACKAGE_HASH=${EXTRA_PACKAGE_HASH}
+COPY ./submodule /opt/submodule
 
-RUN pip install --force-reinstall -r /opt/requirements.txt && \
-${CONDA_DIR}/envs/python2/bin/pip install --force-reinstall -r /opt/requirements.txt
+RUN cd /opt/submodule && \
+ls -F1 | sed 's/\///g' | xargs -I {} bash -c "cd {} && pip install --force-reinstall ." && \
+cd ..

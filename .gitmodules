@@ -1,0 +1,12 @@
+[submodule "docker/submodule/rqalpha-mod-optimization"]
+	path = docker/submodule/rqalpha-mod-optimization
+	url = https://github.com/xingetouzi/rqalpha-mod-optimization.git
+[submodule "docker/submodule/fxdayu_data"]
+	path = docker/submodule/fxdayu_data
+	url = https://github.com/xingetouzi/fxdayu_data.git
+[submodule "docker/submodule/rqalpha-mod-fxdayu-source"]
+	path = docker/submodule/rqalpha-mod-fxdayu-source
+	url = https://github.com/xingetouzi/rqalpha-mod-fxdayu-source.git
+[submodule "docker/submodule/rqalpha"]
+	path = docker/submodule/rqalpha
+	url = https://github.com/xingetouzi/rqalpha.git
