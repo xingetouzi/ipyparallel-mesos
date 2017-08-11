@@ -85,7 +85,7 @@ class MarathonLauncher(BaseLauncher):
     engine_docker_env_keep = List(config=True,
                                   help="Environment variables to inherit of engine container")
 
-    engine_docker_volumes = List(Config=True,
+    engine_docker_volumes = List(config=True,
                                  help="Host Volumes of engine container")
 
     engine_memory = Integer(1024, config=True,
@@ -240,8 +240,9 @@ class MarathonEngineSetLauncher(MarathonLauncher):
     def _parse_volume(volume_str):
         paras = volume_str.split(":", 3)
         return {
-            "HostPath": paras[0],
-            "ContainerPath": paras[1]
+            "hostPath": paras[0],
+            "containerPath": paras[1],
+            "mode": "RW"
         }
 
     def _build_marathon_config(self, n=1):
@@ -252,7 +253,7 @@ class MarathonEngineSetLauncher(MarathonLauncher):
         marathon_config['instances'] = n
         marathon_config['mem'] = self.engine_memory
         marathon_config['container']['docker']['image'] = self.engine_docker_image
-        marathon_config['container']['docker']['volumes'] = list(map(self._parse_volume, self.engine_docker_volumes))
+        marathon_config['container']['volumes'] = list(map(self._parse_volume, self.engine_docker_volumes))
         marathon_config['env'] = {
             'MARATHON_MASTER': self.marathon_master_url,
             'CONTROLLER_MARATHON_ID': self.controller_marathon_id,
