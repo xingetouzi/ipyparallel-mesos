@@ -7,8 +7,8 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
     echo "deb-src http://mirrors.163.com/debian/ jessie main non-free contrib" >>/etc/apt/sources.list && \
     echo "deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
 
-RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
-    conda config --set show_channel_urls yes
+RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ --system && \
+    conda config --set show_channel_urls yes --system
 
 RUN apt-get update --fix-missing && apt-get install sudo supervisor jq -y
 
@@ -22,7 +22,7 @@ CMD ["/usr/bin/supervisord", "-c", "./engine/supervisord.conf"]
 
 RUN chmod 666 /opt/
 
-RUN conda create --quiet --yes -p ${CONDA_DIR}/envs/python2 python=2.7 \
+RUN conda create --quiet --yes -p ${CONDA_DIR}/envs/python2 'python=2.7' \
     'anaconda' && \
     conda remove -n python2 --quiet --yes --force qt pyqt &&\
     conda clean -tipsy
@@ -53,5 +53,5 @@ RUN pip install -r /opt/requirements.txt && ${CONDA_DIR}/envs/python2/bin/pip in
 COPY ./submodule /opt/submodule
 
 RUN cd /opt/submodule && \
-ls -F1 | sed 's/\///g' | xargs -I {} bash -c "cd {} && pip install --force-reinstall ." && \
+ls -F1 | sed 's/\///g' | xargs -I {} bash -c "echo {} && cd {} && pip install --no-cache -q --force-reinstall ." && \
 cd ..
