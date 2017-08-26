@@ -16,7 +16,7 @@ CONTROLLER_HOST=`curl $MARATHON_MASTER/v2/apps/$CONTROLLER_MARATHON_ID | jq -r '
 echo $CONTROLLER_HOST
 curl http://${CONTROLLER_HOST}:${CONTROLLER_CONFIG_PORT:-1235}/ipcontroller-engine.json --create-dirs -o /opt/profile_mesos/security/ipcontroller-engine.json
 cat /opt/profile_mesos/security/ipcontroller-engine.json
-sudo -E PATH=${PATH} -E IPYTHONPATH:${IPYTHONPATH} -u ${USER} -E CONDA_ENVS_PATH:${CONDA_ENVS_PATH} \
+sudo -E PATH=${PATH} -E IPYTHONPATH=${IPYTHONPATH} -u ${USER} -E CONDA_ENVS_PATH:${CONDA_ENVS_PATH} \
 source deactivate && \
 source activate ${CONDA_DEFAULT_ENV} && \
 ipengine --profile=mesos --url=tcp://$HOST:$PORT
