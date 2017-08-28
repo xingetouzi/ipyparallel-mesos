@@ -9,7 +9,7 @@ else
   useradd -u ${USER_ID} -M -s $SHELL ${USER}
 fi
 
-sudo chown -R ${USER}:{USER} /opt/conda
+sudo chown -R ${USER} /opt/conda
 
 # Query marathon find host of ipython paralell controller
 CONTROLLER_HOST=`curl $MARATHON_MASTER/v2/apps/$CONTROLLER_MARATHON_ID | jq -r '.app.tasks | .[0].host'`
