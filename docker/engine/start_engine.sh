@@ -1,15 +1,15 @@
 #!/bin/bash 
 
 # 创建用户
-set -e
-if getent passwd ${USER_ID} > /dev/null ; then
-  echo "${USER} (${USER_ID}) exists"
-else
-  echo "Creating user ${USER} (${USER_ID})"
-  useradd -u ${USER_ID} -M -s $SHELL ${USER}
-fi
-
-sudo chown -R ${USER} /opt/conda
+#set -e
+#if getent passwd ${USER_ID} > /dev/null ; then
+#  echo "${USER} (${USER_ID}) exists"
+#else
+#  echo "Creating user ${USER} (${USER_ID})"
+#  useradd -u ${USER_ID} -M -s $SHELL ${USER}
+#fi
+#
+#sudo chown -R ${USER} /opt/conda
 
 # Query marathon find host of ipython paralell controller
 CONTROLLER_HOST=`curl $MARATHON_MASTER/v2/apps/$CONTROLLER_MARATHON_ID | jq -r '.app.tasks | .[0].host'`
