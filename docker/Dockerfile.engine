@@ -49,9 +49,9 @@ COPY ./engine/requirements.txt /opt/requirements.txt
 RUN pip install -r /opt/requirements.txt && ${CONDA_DIR}/envs/python2/bin/pip install -r /opt/requirements.txt
 
 # force update requirement module, usually some custom pakages
-
-COPY ./submodule /opt/submodule
-
-RUN cd /opt/submodule && \
-ls -F1 | sed 's/\///g' | xargs -I {} bash -c "echo {} && cd {} && pip install --no-cache -q --force-reinstall ." && \
-cd ..
+#
+# COPY ./submodule /opt/submodule
+#
+# RUN cd /opt/submodule && \
+# ls -F1 | sed 's/\///g' | xargs -I {} bash -c "echo {} && cd {} && pip install --no-cache -q --force-reinstall ." && \
+# cd ..
