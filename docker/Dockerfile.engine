@@ -1,16 +1,6 @@
-FROM continuumio/anaconda3
+FROM daocloud.io/xingetouzi/anaconda3
 
-#更新apt-get源 使用163的源
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
-    echo "deb http://mirrors.163.com/debian/ jessie main non-free contrib" >/etc/apt/sources.list && \
-    echo "deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list && \
-    echo "deb-src http://mirrors.163.com/debian/ jessie main non-free contrib" >>/etc/apt/sources.list && \
-    echo "deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list
-
-RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ --system && \
-    conda config --set show_channel_urls yes --system
-
-RUN apt-get update --fix-missing && apt-get install sudo supervisor jq -y
+RUN yum install -y sudo supervisor jq
 
 WORKDIR /opt
 
@@ -20,8 +10,6 @@ ENV IPYTHONDIR=/opt/
 
 CMD ["/usr/bin/supervisord", "-c", "./engine/supervisord.conf"]
 
-RUN chmod 666 /opt/
-
 RUN conda create --quiet --yes -p ${CONDA_DIR}/envs/python2 'python=2.7' \
     'anaconda' && \
     conda remove -n python2 --quiet --yes --force qt pyqt &&\
@@ -30,8 +18,6 @@ RUN conda create --quiet --yes -p ${CONDA_DIR}/envs/python2 'python=2.7' \
 # Add shortcuts to distinguish pip for python2 and python3 envs
 RUN ln -s $CONDA_DIR/envs/python2/bin/pip $CONDA_DIR/bin/pip2 && \
     ln -s $CONDA_DIR/bin/pip $CONDA_DIR/bin/pip3
-
-RUN apt-get install gcc g++ build-essential -y
 
 COPY pip.conf /root/.pip/pip.conf
 
